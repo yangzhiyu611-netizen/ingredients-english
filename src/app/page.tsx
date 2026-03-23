@@ -1034,9 +1034,6 @@ export default function Home() {
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-3">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
-                    Core
-                  </p>
                   {coreBankWords.map((w, idx) => {
                     const unlocked = idx < visibleCoreCount;
                     const used = usedIngredients.includes(w);
