@@ -829,22 +829,16 @@ export default function Home() {
       ] ?? PAIR_COUNT;
 
     const isReviewMode = phase === "review";
-    const isPairPickMode = currentItem?.type === "pairPick";
     const visibleCoreCount = isReviewMode
       ? CORE_COUNT
       : currentItem?.type === "corePick"
-        ? Math.max(1, Math.min(baseCoreCount, CORE_COUNT) - 1) // 选择题允许看到“下一组核心词”用于选择
+        ? Math.min(baseCoreCount, CORE_COUNT) // corePick 时保证目标 core 卡片可见
         : Math.min(baseCoreCount, CORE_COUNT);
     const visiblePairCount = isReviewMode ? PAIR_COUNT : Math.min(basePairCount, PAIR_COUNT);
-    const coreBankWords = isPairPickMode ? [] : coreWords.slice(0, CORE_COUNT);
-    const pairBankWords = isPairPickMode
-      ? currentItem?.targetPair
-        ? [currentItem.targetPair]
-        : []
-      : pairWords.slice(0, PAIR_COUNT);
-    const bankCount = isPairPickMode
-      ? pairBankWords.length
-      : Math.min(visibleCoreCount + visiblePairCount, 6);
+    // 复习阶段始终展示全部单词卡片（无论当前题型）
+    const coreBankWords = coreWords.slice(0, CORE_COUNT);
+    const pairBankWords = pairWords.slice(0, PAIR_COUNT);
+    const bankCount = Math.min(visibleCoreCount + visiblePairCount, 6);
 
     const cutDisabled =
       phase !== "learning" || !currentItem
@@ -1070,7 +1064,7 @@ export default function Home() {
                     Pair
                   </p>
                   {pairBankWords.map((w, idx) => {
-                    const unlocked = isPairPickMode ? true : idx < visiblePairCount;
+                    const unlocked = idx < visiblePairCount;
                     const used = usedIngredients.includes(w);
                     return (
                       <button
