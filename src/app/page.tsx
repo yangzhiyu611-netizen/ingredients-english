@@ -319,15 +319,19 @@ export default function Home() {
     finalCore: string[],
   ) => {
     // 固定：每个 core 对应 3 道 phrase（按你的顺序生成的 9 道题）
-    // 在学完 core1 的 3 道后，插入一个“选 core1（回顾）”的题；
-    // 在学完 core2 的 3 道后，插入一个“选 core2（回顾）”的题。
+    // 调整为：先 corePick，再学该 core 下的 3 道 phrase。
     const seq: SequenceItem[] = [];
-    for (let i = 0; i < questions.length; i++) {
-      seq.push({ type: "phrase", phraseIndex: i });
-      if (i === 2 && finalCore[0])
-        seq.push({ type: "corePick", targetCore: finalCore[0] });
-      if (i === 5 && finalCore[1])
-        seq.push({ type: "corePick", targetCore: finalCore[1] });
+    const groupSize = 3;
+    for (let coreIdx = 0; coreIdx < finalCore.length; coreIdx++) {
+      const core = finalCore[coreIdx];
+      if (core) {
+        seq.push({ type: "corePick", targetCore: core });
+      }
+      const start = coreIdx * groupSize;
+      const end = start + groupSize;
+      for (let i = start; i < end && i < questions.length; i++) {
+        seq.push({ type: "phrase", phraseIndex: i });
+      }
     }
     return seq;
   };
