@@ -275,15 +275,26 @@ export default function Home() {
         const core = c[ci];
         const pair = p[pi];
         if (!core || !pair) return null;
-        const phrase = `${core} ${pair}`;
-        if (gameConfig.rules.useValidPhraseWhitelist && !validPhraseSet.has(phrase))
+        const configKey = `${core} ${pair}`;
+        if (
+          gameConfig.rules.useValidPhraseWhitelist &&
+          !validPhraseSet.has(configKey)
+        )
           return null;
 
-        const content = phraseContent[phrase];
-        const zh = content?.zh ?? gameConfig.validPhraseZh[phrase] ?? "（占位）";
+        // 展示与判题顺序采用 pair + core（如 stellar record）
+        const phrase = `${pair} ${core}`;
+        const content =
+          phraseContent[configKey] ??
+          phraseContent[phrase];
+        const zh =
+          content?.zh ??
+          gameConfig.validPhraseZh[configKey] ??
+          gameConfig.validPhraseZh[phrase] ??
+          "（占位）";
         return {
           phrase,
-          parts: [core, pair],
+          parts: [pair, core],
           zh,
           clue: content?.clue ?? `做出一道表达：${zh}`,
           example:
@@ -292,10 +303,10 @@ export default function Home() {
           exampleZh: content?.exampleZh ?? "（暂无中文例句）",
           point:
             content?.point ??
-            " ",
+            "该词组在心理/关系语境中很常见，先抓住它的整体感觉与搭配习惯。",
           mistakeAnalysis:
             content?.mistakeAnalysis ??
-            " ",
+            "先确认你是否把某个词按日常义理解了；在心理语境里它常常是另一层抽象义。",
         } satisfies LearningQuestion;
       })
       .filter((q): q is LearningQuestion => q !== null);
@@ -662,7 +673,7 @@ export default function Home() {
                 Prep Your Station
               </h2>
               <p className="mt-0.5 text-xs text-zinc-500">
-                勾掉你已经很稳的词，然后开始学习吧～
+                勾掉你已经很稳的词，然后开始学习吧
               </p>
             </div>
           </div>
@@ -882,7 +893,7 @@ export default function Home() {
                     当前词池无法生成可学习词组
                   </h1>
                   <p className="mt-1 text-xs text-zinc-500">
-                    你斩掉了一些关键单词，导致题库里没有任何词组能被完整拼出。
+                    你斩掉了一些关键 ingredients，导致题库里没有任何 dish 能被完整拼出。
                     返回 Preview 调整词池后再开始。
                   </p>
                 </div>
