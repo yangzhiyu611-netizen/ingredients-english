@@ -10,7 +10,8 @@ type Phase = "learning" | "review";
 
 type ActiveWikiState =
   | { type: "phrase"; index: number; isCorrect: boolean }
-  | { type: "corePick"; core: string; isCorrect: boolean };
+  | { type: "corePick"; core: string; isCorrect: boolean }
+  | { type: "pairPick"; pair: string; isCorrect: boolean };
 
 type LearningQuestion = {
   phrase: string;
@@ -25,7 +26,8 @@ type LearningQuestion = {
 
 type SequenceItem =
   | { type: "phrase"; phraseIndex: number }
-  | { type: "corePick"; targetCore: string };
+  | { type: "corePick"; targetCore: string }
+  | { type: "pairPick"; targetPair: string };
 
 const CORE_COUNT = gameConfig.rules.coreWordCount;
 const PAIR_COUNT = gameConfig.rules.pairWordCount;
@@ -377,25 +379,6 @@ export default function Home() {
       allowedIndices.push(i);
     }
 
-    // 错词优先：优先出包含“学习阶段错词”的词组；同分数下再随机打散。
-    const wrongWordSet = new Set<string>();
-    const allowedSet = new Set<number>(allowedIndices);
-    for (const idx of wrongPhraseIndices) {
-      if (!allowedSet.has(idx)) continue;
-      const q = learningPhrases[idx];
-      if (!q) continue;
-      for (const w of q.parts) wrongWordSet.add(w);
-    }
-
-    const scored = allowedIndices.map((i) => {
-      const q = learningPhrases[i];
-      const score = q.parts.reduce(
-        (acc, w) => acc + (wrongWordSet.has(w) ? 1 : 0),
-        0,
-      );
-      return { i, score };
-    });
-
     const shuffle = (arr: number[]) => {
       const a = [...arr];
       for (let j = a.length - 1; j > 0; j--) {
@@ -405,16 +388,20 @@ export default function Home() {
       return a;
     };
 
-    const order: number[] = [];
-    for (const score of [2, 1, 0] as const) {
-      const group = scored.filter((x) => x.score === score).map((x) => x.i);
-      order.push(...shuffle(group));
-    }
+    // 复习阶段：先考一遍 pair，再随机考词组
+    const reviewPairWords = pairWords.slice(0, PAIR_COUNT);
+    const pairPickSequence: SequenceItem[] = reviewPairWords.map((pair) => ({
+      type: "pairPick",
+      targetPair: pair,
+    }));
 
-    const reviewSequence: SequenceItem[] = order.map((phraseIndex) => ({
+    const randomPhraseOrder = shuffle(allowedIndices);
+    const phraseSequence: SequenceItem[] = randomPhraseOrder.map((phraseIndex) => ({
       type: "phrase",
       phraseIndex,
     }));
+
+    const reviewSequence: SequenceItem[] = [...pairPickSequence, ...phraseSequence];
 
     setLearningSequence(reviewSequence);
     setSequenceIndex(0);
@@ -461,7 +448,7 @@ export default function Home() {
   const handleIngredientClick = (word: string) => {
     if (!currentItem) return;
 
-    if (currentItem.type === "corePick") {
+    if (currentItem.type === "corePick" || currentItem.type === "pairPick") {
       // 核心词选择题：题干是中文释义，选对的核心词才通过
       if (revealResult) return;
       // 只负责“填入”，不直接给正误反馈；正误在 Check Dish 后展示
@@ -582,6 +569,9 @@ export default function Home() {
       return;
     }
 
+    // 非 corePick 不支持“斩 core”
+    if (currentItem.type !== "corePick") return;
+
     // corePick：斩掉 core，复习时所有包含该 core 的词组都过滤掉
     const core = currentItem.targetCore;
     const nextCutCoreWords = cutCoreWords.includes(core)
@@ -632,6 +622,8 @@ export default function Home() {
       });
       return;
     }
+
+    if (activeWikiState.type !== "corePick") return;
 
     // corePick：斩掉 core
     const core = activeWikiState.core;
@@ -837,19 +829,31 @@ export default function Home() {
       ] ?? PAIR_COUNT;
 
     const isReviewMode = phase === "review";
+    const isPairPickMode = currentItem?.type === "pairPick";
     const visibleCoreCount = isReviewMode
       ? CORE_COUNT
       : currentItem?.type === "corePick"
         ? Math.max(1, Math.min(baseCoreCount, CORE_COUNT) - 1) // 选择题允许看到“下一组核心词”用于选择
         : Math.min(baseCoreCount, CORE_COUNT);
     const visiblePairCount = isReviewMode ? PAIR_COUNT : Math.min(basePairCount, PAIR_COUNT);
+    const coreBankWords = isPairPickMode ? [] : coreWords.slice(0, CORE_COUNT);
+    const pairBankWords = isPairPickMode
+      ? currentItem?.targetPair
+        ? [currentItem.targetPair]
+        : []
+      : pairWords.slice(0, PAIR_COUNT);
+    const bankCount = isPairPickMode
+      ? pairBankWords.length
+      : Math.min(visibleCoreCount + visiblePairCount, 6);
 
     const cutDisabled =
       phase !== "learning" || !currentItem
         ? true
         : currentItem.type === "phrase"
           ? cutPhraseIndices.includes(currentItem.phraseIndex)
-          : cutCoreWords.includes(currentItem.targetCore);
+          : currentItem.type === "corePick"
+            ? cutCoreWords.includes(currentItem.targetCore)
+            : true;
     return (
       <div className="flex min-h-screen w-full justify-center bg-zinc-50 text-zinc-900">
         <div className="relative flex h-screen w-full max-w-md flex-col bg-white">
@@ -916,10 +920,16 @@ export default function Home() {
                 <h1 className="mb-1 text-2xl font-semibold text-zinc-900">
                   {currentItem.type === "phrase"
                     ? currentPhrase?.zh
-                    : gameConfig.wordZh[currentItem.targetCore] ?? "选择对应核心词"}
+                    : currentItem.type === "corePick"
+                      ? gameConfig.wordZh[currentItem.targetCore] ?? "选择对应核心词"
+                      : gameConfig.wordZh[currentItem.targetPair] ?? "选择对应搭配词"}
                 </h1>
                 <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-zinc-400">
-                  {currentItem.type === "phrase" ? "Main Concept" : "Pick the Core Word"}
+                  {currentItem.type === "phrase"
+                    ? "Main Concept"
+                    : currentItem.type === "corePick"
+                      ? "Pick the Core Word"
+                      : "Pick the Pair Word"}
                 </p>
                 {currentItem.type === "corePick" && corePickWrong && (
                   <p className="mt-2 text-xs font-medium text-rose-500">
@@ -931,7 +941,9 @@ export default function Home() {
               <div className="flex w-full justify-center gap-3 pb-4">
                 {(currentItem.type === "phrase"
                   ? currentPhrase?.parts ?? []
-                  : [currentItem.targetCore]
+                  : currentItem.type === "corePick"
+                    ? [currentItem.targetCore]
+                    : [currentItem.targetPair]
                 ).map((part, idx) => {
                   const filled = plate[idx];
                   const isCorrectSlot = revealResult && filled && filled === part;
@@ -1023,7 +1035,7 @@ export default function Home() {
                   Word Bank
                 </h2>
                 <span className="text-[10px] font-medium text-zinc-400">
-                  {Math.min(visibleCoreCount + visiblePairCount, 6)}/6
+                  {bankCount}/6
                 </span>
               </div>
               <div className="grid grid-cols-2 gap-3">
@@ -1031,7 +1043,7 @@ export default function Home() {
                   <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
                     Core
                   </p>
-                  {coreWords.slice(0, CORE_COUNT).map((w, idx) => {
+                  {coreBankWords.map((w, idx) => {
                     const unlocked = idx < visibleCoreCount;
                     const used = usedIngredients.includes(w);
                     return (
@@ -1057,8 +1069,8 @@ export default function Home() {
                   <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
                     Pair
                   </p>
-                  {pairWords.slice(0, PAIR_COUNT).map((w, idx) => {
-                    const unlocked = idx < visiblePairCount;
+                  {pairBankWords.map((w, idx) => {
+                    const unlocked = isPairPickMode ? true : idx < visiblePairCount;
                     const used = usedIngredients.includes(w);
                     return (
                       <button
@@ -1121,23 +1133,35 @@ export default function Home() {
                   return;
                 }
 
-                // corePick：也用 Check Dish 触发正误反馈 -> wiki
+                // corePick / pairPick：也用 Check Dish 触发正误反馈 -> wiki
                 const picked = plate[0];
                 if (!picked) return;
-                const isCorrect = picked === currentItem.targetCore;
+                const expected =
+                  currentItem.type === "corePick"
+                    ? currentItem.targetCore
+                    : currentItem.targetPair;
+                const isCorrect = picked === expected;
                 setLastAttemptWords([picked]);
                 setRevealResult(true);
                 setLastCheckCorrect(isCorrect);
                 setCorePickWrong(!isCorrect);
                 playFeedbackSound(isCorrect ? "correct" : "wrong");
-                if (isCorrect) speakPhrase(currentItem.targetCore);
+                if (isCorrect) speakPhrase(expected);
                 const delayMs = isCorrect ? 650 : 420;
                 window.setTimeout(() => {
-                  setActiveWikiState({
-                    type: "corePick",
-                    core: currentItem.targetCore,
-                    isCorrect,
-                  });
+                  if (currentItem.type === "corePick") {
+                    setActiveWikiState({
+                      type: "corePick",
+                      core: currentItem.targetCore,
+                      isCorrect,
+                    });
+                  } else {
+                    setActiveWikiState({
+                      type: "pairPick",
+                      pair: currentItem.targetPair,
+                      isCorrect,
+                    });
+                  }
                   setStep("feedback");
                 }, delayMs);
               }}
@@ -1156,27 +1180,31 @@ export default function Home() {
 
     const isPhrase = activeWikiState.type === "phrase";
     const phrase = isPhrase ? learningPhrases[activeWikiState.index] : null;
-    const core = !isPhrase ? activeWikiState.core : null;
+    const pickWord = !isPhrase
+      ? activeWikiState.type === "corePick"
+        ? activeWikiState.core
+        : activeWikiState.pair
+      : null;
     const isCorrect = activeWikiState.isCorrect;
 
-    const title = isPhrase ? phrase?.phrase ?? "" : core ?? "";
+    const title = isPhrase ? phrase?.phrase ?? "" : pickWord ?? "";
     const titleZh = isPhrase
       ? phrase?.zh ?? ""
-      : gameConfig.wordZh[core ?? ""] ?? "";
+      : gameConfig.wordZh[pickWord ?? ""] ?? "";
     const ipa = isPhrase
       ? (phrase?.phrase ?? "")
           .split(" ")
           .map((w) => gameConfig.wordIpa[w] ?? "")
           .filter(Boolean)
           .join(" ")
-      : gameConfig.wordIpa[core ?? ""] ?? "";
+      : gameConfig.wordIpa[pickWord ?? ""] ?? "";
     const keyPointText = isPhrase
       ? (phrase?.parts ?? [])
           .map((w) => `${w}：${gameConfig.wordZh[w] ?? "（暂无释义）"}`)
           .join("；")
-      : `${core}：${gameConfig.wordZh[core ?? ""] ?? "（暂无释义）"}`;
+      : `${pickWord}：${gameConfig.wordZh[pickWord ?? ""] ?? "（暂无释义）"}`;
 
-    const coreWord = isPhrase ? (phrase?.parts?.[0] ?? "") : (core ?? "");
+    const coreWord = isPhrase ? (phrase?.parts?.[0] ?? "") : (pickWord ?? "");
     const pairWord = isPhrase ? (phrase?.parts?.[1] ?? "") : "";
 
     const cutDisabled =
@@ -1184,7 +1212,9 @@ export default function Home() {
         ? true
         : activeWikiState.type === "phrase"
           ? cutPhraseIndices.includes(activeWikiState.index)
-          : cutCoreWords.includes(activeWikiState.core);
+          : activeWikiState.type === "corePick"
+            ? cutCoreWords.includes(activeWikiState.core)
+            : true;
 
     return (
       <div className="flex min-h-screen w-full justify-center bg-zinc-50 text-zinc-900">
