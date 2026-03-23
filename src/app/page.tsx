@@ -642,11 +642,6 @@ export default function Home() {
     <div className="flex min-h-screen w-full justify-center bg-zinc-50 text-zinc-900">
       <div className="relative flex h-screen w-full max-w-md flex-col bg-white">
         <header className="flex h-14 items-center justify-between border-b border-zinc-100 px-4">
-          <button className="flex items-center text-zinc-400">
-            <span className="material-symbols-outlined text-[20px]">
-              arrow_back
-            </span>
-          </button>
           <div className="text-center">
             <h1 className="text-xs font-bold uppercase tracking-tight">
               Today's Ingredients
@@ -852,17 +847,6 @@ export default function Home() {
       <div className="flex min-h-screen w-full justify-center bg-zinc-50 text-zinc-900">
         <div className="relative flex h-screen w-full max-w-md flex-col bg-white">
           <header className="flex h-14 items-center justify-between border-b border-zinc-100 px-4">
-            <button
-              onClick={() => {
-                setPhase("learning");
-                setStep("preview");
-              }}
-              className="flex items-center text-zinc-400"
-            >
-              <span className="material-symbols-outlined text-[20px]">
-                arrow_back
-              </span>
-            </button>
             <span />
             <div className="flex items-center gap-3">
               {phase === "learning" && (
@@ -918,13 +902,6 @@ export default function Home() {
                       ? gameConfig.wordZh[currentItem.targetCore] ?? "选择对应核心词"
                       : gameConfig.wordZh[currentItem.targetPair] ?? "选择对应搭配词"}
                 </h1>
-                <p className="text-[10px] font-semibold uppercase tracking-[0.25em] text-zinc-400">
-                  {currentItem.type === "phrase"
-                    ? "Main Concept"
-                    : currentItem.type === "corePick"
-                      ? "Pick the Core Word"
-                      : "Pick the Pair Word"}
-                </p>
                 {currentItem.type === "corePick" && corePickWrong && (
                   <p className="mt-2 text-xs font-medium text-rose-500">
                     选错了，再试一次。
@@ -1025,9 +1002,6 @@ export default function Home() {
 
             <section className="mt-4 px-6 pb-4">
               <div className="mb-3 flex items-center justify-between">
-                <h2 className="text-[11px] font-bold uppercase tracking-[0.2em] text-zinc-400">
-                  Word Bank
-                </h2>
                 <span className="text-[10px] font-medium text-zinc-400">
                   {bankCount}/6
                 </span>
@@ -1057,9 +1031,6 @@ export default function Home() {
                 </div>
 
                 <div className="space-y-3">
-                  <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-zinc-400">
-                    Pair
-                  </p>
                   {pairBankWords.map((w, idx) => {
                     const unlocked = idx < visiblePairCount;
                     const used = usedIngredients.includes(w);
@@ -1446,14 +1417,6 @@ export default function Home() {
       <div className="flex min-h-screen w-full justify-center bg-zinc-50 text-zinc-900">
         <div className="relative flex h-screen w-full max-w-md flex-col bg-white">
           <header className="flex h-14 items-center justify-between border-b border-zinc-100 px-4">
-            <button
-              onClick={() => setStep("preview")}
-              className="flex items-center text-zinc-400"
-            >
-              <span className="material-symbols-outlined text-[20px]">
-                arrow_back
-              </span>
-            </button>
             <h2 className="text-xs font-bold uppercase tracking-[0.25em] text-zinc-400">
               Summary
             </h2>
