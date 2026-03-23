@@ -63,23 +63,39 @@ export const gameConfig: GameConfig = {
     "unimpeachable",
   ],
   wordFocus: {
-    record: "record：履历、记录。",
-    reputation: "reputation：口碑、名声。",
-    career: "career：生涯、事业。",
-    performance: "performance：业绩、表现。",
-    background: "background：出身、背景。",
-    history: "history：历程。",
-    pedigree: "pedigree：门第、血统。",
-    standing: "standing：地位、身份。",
+    stellar:
+      "该词属于六级超高频词，你5天前刚新学过还未复习，建议再巩固一遍",
+    spotless:
+      "作为四级常考词，你12天前学过，目前正确率78%，建议在“斩”之前再巩固最后一遍。",
+    abysmal:
+      "属于六级难词，系统显示你从未学过此词，建议学习其高频词意“惨淡”的搭配用法",
+    checkered:
+      "六级难词以及高频易混词，你2天前刷过但还未学习过词单词，建议学习其常考词意“曲折的”的搭配用法",
+    mediocre:
+      "六级基础词汇，你20天前学过，遗忘曲线显示该词并未进入深度记忆区",
+    illustrious:
+      "六级难词，你10天前刚学过，正确率暂为60%，是趁热打铁的阶段",
+    flawless:
+      "六级高频词，你30天前学过，正确率为95%，本节将学习词意为”完美的“时的搭配用法",
+    unimpeachable:
+      "六级阅读高频词，目前状态为“未学过”，本节将学习其阅读高频释义”过硬的，无懈可击的“",
 
-    stellar: "stellar：顶级的，一流的。",
-    spotless: "spotless：清白的，无可挑剔的。",
-    abysmal: "abysmal：惨淡的，糟透的。",
-    checkered: "checkered：曲折的。",
-    mediocre: "mediocre：平庸的。",
-    illustrious: "illustrious：显赫的，辉煌的。",
-    flawless: "flawless：完美的，无瑕的。",
-    unimpeachable: "unimpeachable：过硬的，无懈可击的。",
+    record:
+      "六级核心名词，再不同语境下有多个词意，你10天前复习过其”记录“的意思，本节将学习record作为”履历“的搭配用法",
+    reputation:
+      "六级必考词，你3天前学过，正确率为85%，本节将学习其作为”名声和口碑“的搭配用法",
+    career:
+      "六级基础词，15天前学过，正确率为90%，本节将学习其作为”事业、生涯“的搭配用法",
+    performance:
+      "四六级常用词，7天前学过，正确率82%，本节将学习其作为“业绩和表现”的词意",
+    background:
+      "四级常用词，8天前复习过其词意“背景”，本节将学习在阅读语境下作为”出身“的搭配用法",
+    history:
+      "六级入门词，25天前学过词意“历史”，正确率96%，本节将学习在阅读语境下作为”历程“的搭配用法",
+    pedigree:
+      "六级阅读高频词，当前状态为“未学过”，本节将学习阅读高频释义门第，血统“的搭配用法",
+    standing:
+      "六级易混词，已学过其形容词“永久的”，但未学习作为名词“地位，身份“的搭配用法，名词为阅读翻译高频词。",
   },
   wordZh: {
     record: "履历,记录",
