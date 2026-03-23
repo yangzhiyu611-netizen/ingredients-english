@@ -849,20 +849,6 @@ export default function Home() {
           <header className="flex h-14 items-center justify-between border-b border-zinc-100 px-4">
             <span />
             <div className="flex items-center gap-3">
-              {phase === "learning" && (
-                <button
-                  onClick={cutCurrentInLearning}
-                  disabled={cutDisabled}
-                  className={`flex h-6 items-center justify-center rounded-md border px-2 text-[10px] font-bold transition ${
-                    cutDisabled
-                      ? "border-zinc-200 bg-zinc-100 text-zinc-300"
-                      : "border-rose-200 bg-rose-50 text-rose-600 active:scale-[0.98]"
-                  }`}
-                  aria-label="cut current"
-                >
-                  斩
-                </button>
-              )}
               <span className="text-[10px] text-zinc-400">
                 {learningPhrases.length === 0
                   ? "0 / 0"
@@ -1057,80 +1043,97 @@ export default function Home() {
           </main>
 
           <div className="fixed bottom-0 left-1/2 z-10 w-full max-w-md -translate-x-1/2 border-t border-zinc-100 bg-white/95 px-4 py-3 backdrop-blur">
-            <button
-              onClick={() => {
-                if (!currentItem) return;
+            <div className="flex gap-2">
+              {phase === "learning" && (
+                <button
+                  onClick={cutCurrentInLearning}
+                  disabled={cutDisabled}
+                  className={`flex h-11 w-16 items-center justify-center rounded-lg border px-2 text-sm font-semibold transition ${
+                    cutDisabled
+                      ? "border-zinc-200 bg-zinc-100 text-zinc-300"
+                      : "border-rose-200 bg-rose-50 text-rose-600 active:scale-[0.98]"
+                  }`}
+                  aria-label="cut current"
+                >
+                  斩
+                </button>
+              )}
 
-                if (currentItem.type === "phrase") {
-                  if (!currentPhrase) return;
-                  const isCorrect =
-                    plate.length === currentPhrase.parts.length &&
-                    currentPhrase.parts.every(
-                      (part, idx) => part === plate[idx],
-                    );
-                  setLastAttemptWords([...plate]);
+              <button
+                onClick={() => {
+                  if (!currentItem) return;
+
+                  if (currentItem.type === "phrase") {
+                    if (!currentPhrase) return;
+                    const isCorrect =
+                      plate.length === currentPhrase.parts.length &&
+                      currentPhrase.parts.every(
+                        (part, idx) => part === plate[idx],
+                      );
+                    setLastAttemptWords([...plate]);
+                    setRevealResult(true);
+                    setLastCheckCorrect(isCorrect);
+                    playFeedbackSound(isCorrect ? "correct" : "wrong");
+                    if (!isCorrect) {
+                      if (phase === "learning") {
+                        setWrongPhraseIndices((prev) =>
+                          prev.includes(currentItem.phraseIndex)
+                            ? prev
+                            : [...prev, currentItem.phraseIndex],
+                        );
+                      }
+                    } else {
+                      speakPhrase(currentPhrase.phrase);
+                    }
+                    const delayMs = isCorrect ? 650 : 420;
+                    window.setTimeout(() => {
+                      setActiveWikiState({
+                        type: "phrase",
+                        index: currentItem.phraseIndex,
+                        isCorrect,
+                      });
+                      setStep("feedback");
+                    }, delayMs);
+                    return;
+                  }
+
+                  // corePick / pairPick：也用 Check Dish 触发正误反馈 -> wiki
+                  const picked = plate[0];
+                  if (!picked) return;
+                  const expected =
+                    currentItem.type === "corePick"
+                      ? currentItem.targetCore
+                      : currentItem.targetPair;
+                  const isCorrect = picked === expected;
+                  setLastAttemptWords([picked]);
                   setRevealResult(true);
                   setLastCheckCorrect(isCorrect);
+                  setCorePickWrong(!isCorrect);
                   playFeedbackSound(isCorrect ? "correct" : "wrong");
-                  if (!isCorrect) {
-                    if (phase === "learning") {
-                      setWrongPhraseIndices((prev) =>
-                        prev.includes(currentItem.phraseIndex)
-                          ? prev
-                          : [...prev, currentItem.phraseIndex],
-                      );
-                    }
-                  } else {
-                    speakPhrase(currentPhrase.phrase);
-                  }
+                  if (isCorrect) speakPhrase(expected);
                   const delayMs = isCorrect ? 650 : 420;
                   window.setTimeout(() => {
-                    setActiveWikiState({
-                      type: "phrase",
-                      index: currentItem.phraseIndex,
-                      isCorrect,
-                    });
+                    if (currentItem.type === "corePick") {
+                      setActiveWikiState({
+                        type: "corePick",
+                        core: currentItem.targetCore,
+                        isCorrect,
+                      });
+                    } else {
+                      setActiveWikiState({
+                        type: "pairPick",
+                        pair: currentItem.targetPair,
+                        isCorrect,
+                      });
+                    }
                     setStep("feedback");
                   }, delayMs);
-                  return;
-                }
-
-                // corePick / pairPick：也用 Check Dish 触发正误反馈 -> wiki
-                const picked = plate[0];
-                if (!picked) return;
-                const expected =
-                  currentItem.type === "corePick"
-                    ? currentItem.targetCore
-                    : currentItem.targetPair;
-                const isCorrect = picked === expected;
-                setLastAttemptWords([picked]);
-                setRevealResult(true);
-                setLastCheckCorrect(isCorrect);
-                setCorePickWrong(!isCorrect);
-                playFeedbackSound(isCorrect ? "correct" : "wrong");
-                if (isCorrect) speakPhrase(expected);
-                const delayMs = isCorrect ? 650 : 420;
-                window.setTimeout(() => {
-                  if (currentItem.type === "corePick") {
-                    setActiveWikiState({
-                      type: "corePick",
-                      core: currentItem.targetCore,
-                      isCorrect,
-                    });
-                  } else {
-                    setActiveWikiState({
-                      type: "pairPick",
-                      pair: currentItem.targetPair,
-                      isCorrect,
-                    });
-                  }
-                  setStep("feedback");
-                }, delayMs);
-              }}
-              className="flex h-11 w-full items-center justify-center gap-2 rounded-lg bg-emerald-600 text-sm font-semibold text-white active:scale-[0.98] transition"
-            >
-              提交
-            </button>
+                }}
+                className="flex h-11 flex-1 items-center justify-center gap-2 rounded-lg bg-emerald-600 text-sm font-semibold text-white active:scale-[0.98] transition"
+              >
+                提交
+              </button>
+            </div>
           </div>
         </div>
       </div>
