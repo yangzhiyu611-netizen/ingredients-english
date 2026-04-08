@@ -284,14 +284,14 @@ const PHRASE_DATA: Record<
     exampleZh: "这匹赛马有着顶级的门第（血统），是一头传奇冠军的后代。",
   },
   "spotless pedigree": {
-    zh: "清白的门扉",
+    zh: "清白的门第",
     en: "The aristocratic family took great pride in their spotless pedigree.",
     exampleZh: "这个贵族家庭对他们那清白的门扉深感自豪。",
   },
   "abysmal pedigree": {
     zh: "糟透的门第",
-    en: "Investors stayed away from the project due to its abysmal pedigree of failed leadership.",
-    exampleZh: "由于该项目在领导层失败方面那糟透的门第（渊源），投资者们望而却步。",
+    en: "Investors stayed away from the project due to its abysmal pedigree of leadership.",
+    exampleZh: "由于该项目领导糟透的门第，投资者们望而却步。",
   },
   "checkered pedigree": {
     zh: "曲折的出身",
@@ -311,12 +311,12 @@ const PHRASE_DATA: Record<
   "flawless pedigree": {
     zh: "完美的出身",
     en: "This vintage wine has a flawless pedigree, tracked from the vineyard to the cellar.",
-    exampleZh: "这款陈年佳酿有着完美的出身（来源记录），从葡萄园到酒窖都有迹可循。",
+    exampleZh: "这款陈年佳酿有着完美的出身，从葡萄园到酒窖都有迹可循。",
   },
   "unimpeachable pedigree": {
     zh: "过硬的出身",
     en: "The scholar’s unimpeachable pedigree was established under the tutelage of grandmasters.",
-    exampleZh: "这位学者在多位大师的指导下建立了其过硬的出身（师承）。",
+    exampleZh: "这位学者在多位大师的指导下建立了其过硬的出身。",
   },
 
   "stellar standing": {
@@ -332,7 +332,7 @@ const PHRASE_DATA: Record<
   "abysmal standing": {
     zh: "曲折的身份",
     en: "Following the corruption scandal, his abysmal standing made a political comeback impossible.",
-    exampleZh: "在贪腐丑闻之后，他那曲折的身份（糟糕的处境）使政治复出变得不可能。",
+    exampleZh: "在贪腐丑闻之后，他那曲折的身份使政治复出变得不可能。",
   },
   "checkered standing": {
     zh: "驳杂的地位",
