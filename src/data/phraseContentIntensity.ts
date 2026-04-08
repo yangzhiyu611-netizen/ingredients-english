@@ -9,6 +9,8 @@ const CORE_WORDS = [
   "history",
   "pedigree",
   "standing",
+  "stature",
+  "trajectory",
 ] as const;
 
 const PAIR_WORDS = [
@@ -356,6 +358,88 @@ const PHRASE_DATA: Record<
     zh: "无懈可击的地位",
     en: "As a man of unimpeachable standing, his testimony carried great weight in court.",
     exampleZh: "作为一个地位无懈可击的人，他的证词在法庭上极具分量。",
+  },
+
+  "stellar stature": {
+    zh: "顶尖的声望",
+    en: "Her stellar stature in the fashion world grants her access to every major gala.",
+    exampleZh: "她在时尚界顶级的地位使她能够参加每一个重要的盛会。",
+  },
+  "spotless stature": {
+    zh: "清白的声望",
+    en: "He maintained a spotless stature throughout his term as the city's mayor.",
+    exampleZh: "在担任市长的整个任期内，他一直维持着清白的身份。",
+  },
+  "abysmal stature": {
+    zh: "惨淡的声望",
+    en: "The company’s abysmal stature after the fraud made hiring impossible.",
+    exampleZh: "诈骗案后，该公司那惨淡的地位（名声）让招聘变得不可能。",
+  },
+  "checkered stature": {
+    zh: "毁誉参半的声望",
+    en: "The actor has a checkered stature in Hollywood, known for both hits and flops.",
+    exampleZh: "这位演员在好莱坞有着波折的地位，既出过大片也拍过烂片。",
+  },
+  "mediocre stature": {
+    zh: "平庸的声望",
+    en: "Despite years in the industry, the firm remains of mediocre stature.",
+    exampleZh: "尽管在该行业多年，这家公司依然处于平庸的地位。",
+  },
+  "illustrious stature": {
+    zh: "显赫的声望",
+    en: "The university’s illustrious stature attracts the best minds from around the world.",
+    exampleZh: "这所大学显赫的地位吸引了来自世界各地的顶尖人才。",
+  },
+  "flawless stature": {
+    zh: "完美的名望",
+    en: "Her flawless stature as a human rights advocate is recognized globally.",
+    exampleZh: "她作为人权倡导者那完美的地位（形象）得到了全球公认。",
+  },
+  "unimpeachable stature": {
+    zh: "无懈可击的声望",
+    en: "His unimpeachable stature as a judge makes him the final authority on the case.",
+    exampleZh: "他作为法官那无懈可击的地位使他成为该案件的最终权威。",
+  },
+
+  "stellar trajectory": {
+    zh: "一流的轨迹",
+    en: "The young CEO is on a stellar trajectory toward becoming a global leader.",
+    exampleZh: "这位年轻的CEO正处于迈向全球领袖的一流轨迹（走势）中。",
+  },
+  "spotless trajectory": {
+    zh: "清白的历程",
+    en: "His rise from clerk to director was a spotless trajectory of pure hard work.",
+    exampleZh: "他从职员到总监的晋升是一段纯粹依靠努力的清白历程。",
+  },
+  "abysmal trajectory": {
+    zh: "惨淡的走势",
+    en: "The movie’s abysmal trajectory at the box office led to a massive loss.",
+    exampleZh: "该电影在票房上惨淡的走势导致了巨大的损失。",
+  },
+  "checkered trajectory": {
+    zh: "曲折的轨迹",
+    en: "The country’s economy has followed a checkered trajectory over the last decade.",
+    exampleZh: "在过去的十年里，该国的经济遵循了一段曲折的轨迹。",
+  },
+  "mediocre trajectory": {
+    zh: "平庸的走势",
+    en: "The product's sales have followed a mediocre trajectory since its launch.",
+    exampleZh: "自发布以来，该产品的销售一直遵循着平庸的走势。",
+  },
+  "illustrious trajectory": {
+    zh: "辉煌的历程",
+    en: "The athlete’s illustrious trajectory ended with three Olympic gold medals.",
+    exampleZh: "这位运动员辉煌的历程以三枚奥运金牌画上了句号。",
+  },
+  "flawless trajectory": {
+    zh: "完美的轨迹",
+    en: "The rocket followed a flawless trajectory into the Earth's orbit.",
+    exampleZh: "火箭遵循完美的轨迹进入了地球轨道。",
+  },
+  "unimpeachable trajectory": {
+    zh: "无懈可击的历程",
+    en: "The investigation revealed an unimpeachable trajectory of legal compliance.",
+    exampleZh: "调查揭示了一段无懈可击的（合规）历程。",
   },
 };
 

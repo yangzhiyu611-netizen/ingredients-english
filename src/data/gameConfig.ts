@@ -49,11 +49,11 @@ export const gameConfig: GameConfig = {
     pairWords: ["stellar", "spotless", "abysmal"],
   },
   coreReplacementPool: [
-    "performance",
     "background",
-    "history",
     "pedigree",
     "standing",
+    "stature",
+    "trajectory",
   ],
   pairReplacementPool: [
     "checkered",
@@ -96,6 +96,10 @@ export const gameConfig: GameConfig = {
       "六级阅读高频词，当前状态为“未学过”，本节将学习阅读高频释义门第，血统“的搭配用法",
     standing:
       "六级易混词，已学过其形容词“永久的”，但未学习作为名词“地位，身份“的搭配用法，名词为阅读翻译高频词。",
+
+    stature:
+      "阅读高阶词汇，“未学过”，它是形容一个人地位与高度的终极表达。",
+    trajectory: "阅读高阶词汇，3天前学过，正确率为 30%。",
   },
   wordZh: {
     record: "履历,记录",
@@ -106,6 +110,8 @@ export const gameConfig: GameConfig = {
     history: "历程",
     pedigree: "门第，血统",
     standing: "地位，身份",
+    stature: "名望，声望",
+    trajectory: "轨迹，走势",
 
     stellar: "顶级的，一流的",
     spotless: "清白的，无可挑剔的",
@@ -125,6 +131,8 @@ export const gameConfig: GameConfig = {
     history: "/ˈhɪstəri/",
     pedigree: "/ˈpedɪɡriː/",
     standing: "/ˈstændɪŋ/",
+    stature: "/ˈstætʃər/",
+    trajectory: "/trəˈdʒektəri/",
 
     stellar: "/ˈstɛləriːr/",
     spotless: "/ˈspɑːtˌləs/",
@@ -215,6 +223,26 @@ export const gameConfig: GameConfig = {
     "standing illustrious": "显赫的地位",
     "standing flawless": "完美的身份",
     "standing unimpeachable": "无懈可击的地位",
+
+    // stature
+    "stature stellar": "顶尖的声望",
+    "stature spotless": "清白的声望",
+    "stature abysmal": "惨淡的声望",
+    "stature checkered": "毁誉参半的声望",
+    "stature mediocre": "平庸的声望",
+    "stature illustrious": "显赫的声望",
+    "stature flawless": "完美的名望",
+    "stature unimpeachable": "无懈可击的声望",
+
+    // trajectory
+    "trajectory stellar": "一流的轨迹",
+    "trajectory spotless": "清白的历程",
+    "trajectory abysmal": "惨淡的走势",
+    "trajectory checkered": "曲折的轨迹",
+    "trajectory mediocre": "平庸的走势",
+    "trajectory illustrious": "辉煌的历程",
+    "trajectory flawless": "完美的轨迹",
+    "trajectory unimpeachable": "无懈可击的历程",
   },
   phraseContent: {
     ...phraseContentIntensity,

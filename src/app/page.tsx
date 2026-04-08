@@ -208,8 +208,8 @@ export default function Home() {
       .slice(0, PAIR_COUNT)
       .filter((w) => !nextSkippedPair.includes(w));
 
-    let nextCore = [...remainingCore];
-    let nextPair = [...remainingPair];
+    const nextCore = [...remainingCore];
+    const nextPair = [...remainingPair];
 
     // 使用局部候选池副本，避免 while 中 splice 修改 useMemo 结果
     const coreCandidates = [...availableCorePool];
@@ -642,14 +642,7 @@ export default function Home() {
     <div className="flex min-h-screen w-full justify-center bg-zinc-50 text-zinc-900">
       <div className="relative flex h-screen w-full max-w-md flex-col bg-white">
         <header className="flex h-14 items-center justify-between border-b border-zinc-100 px-4">
-          <div className="text-center">
-            <h1 className="text-xs font-bold uppercase tracking-tight">
-              Today's Ingredients
-            </h1>
-            <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-emerald-600">
-              Social &amp; Emotional
-            </p>
-          </div>
+          <span />
           <button className="flex items-center text-zinc-400">
             <span className="material-symbols-outlined text-[20px]">
               info
@@ -737,9 +730,6 @@ export default function Home() {
               }}
               className="flex h-11 flex-1 items-center justify-center gap-2 rounded-lg bg-zinc-900 text-sm font-semibold text-white active:scale-[0.98] transition"
             >
-              <span className="material-symbols-outlined text-[18px]">
-                skillet
-              </span>
               斩掉并确认词池
             </button>
             <button
@@ -767,7 +757,7 @@ export default function Home() {
                   </span>
                 </div>
                 <p className="text-sm font-medium leading-relaxed text-zinc-800">
-                  斩掉后将无法学习这些单词在心理语境中特有的意思哦，是否确认斩掉？
+                  斩掉后将无法学习这些备考单词，是否确认斩掉？
                 </p>
               </div>
               <div className="flex border-t border-zinc-100 text-sm">
@@ -872,14 +862,6 @@ export default function Home() {
               </div>
             ) : (
             <div className="flex flex-col items-center px-6 pt-6">
-              <div className="mb-5 h-28 w-44 rounded-xl border border-zinc-50 bg-zinc-100 shadow-sm">
-                {/* 预留插画位 */}
-                <div className="flex h-full items-center justify-center text-zinc-300">
-                  <span className="material-symbols-outlined text-4xl">
-                    image
-                  </span>
-                </div>
-              </div>
               <div className="mb-6 text-center">
                 <h1 className="mb-1 text-2xl font-semibold text-zinc-900">
                   {currentItem.type === "phrase"
@@ -1087,6 +1069,10 @@ export default function Home() {
                     }
                     const delayMs = isCorrect ? 650 : 420;
                     window.setTimeout(() => {
+                      if (phase === "review") {
+                        goToNextDish();
+                        return;
+                      }
                       setActiveWikiState({
                         type: "phrase",
                         index: currentItem.phraseIndex,
@@ -1113,6 +1099,10 @@ export default function Home() {
                   if (isCorrect) speakPhrase(expected);
                   const delayMs = isCorrect ? 650 : 420;
                   window.setTimeout(() => {
+                    if (phase === "review") {
+                      goToNextDish();
+                      return;
+                    }
                     if (currentItem.type === "corePick") {
                       setActiveWikiState({
                         type: "corePick",
