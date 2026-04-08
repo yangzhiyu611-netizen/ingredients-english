@@ -206,7 +206,7 @@ export const gameConfig: GameConfig = {
 
     // pedigree
     "pedigree stellar": "顶级的门第",
-    "pedigree spotless": "清白的门扉",
+    "pedigree spotless": "清白的门第",
     "pedigree abysmal": "糟透的门第",
     "pedigree checkered": "曲折的出身",
     "pedigree mediocre": "平庸的出身",
