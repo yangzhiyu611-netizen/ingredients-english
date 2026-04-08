@@ -4,7 +4,7 @@
 import { useMemo, useRef, useState } from "react";
 import { gameConfig, validPhraseSet } from "@/data/gameConfig";
 
-type Step = "preview" | "learn" | "review" | "feedback" | "summary";
+type Step = "preview" | "learn" | "review" | "feedback" | "summary" | "done";
 
 type Phase = "learning" | "review";
 
@@ -501,9 +501,9 @@ export default function Home() {
       if (phase === "learning") {
         setStep("summary");
       } else {
-        // 复习阶段结束：不再进入总结页
+        // 复习阶段结束：展示“复习完成”，不自动跳回预览列表
         setPhase("learning");
-        setStep("preview");
+        setStep("done");
         setLearningPhrases([]);
         setLearningSequence([]);
         setSequenceIndex(0);
@@ -524,6 +524,42 @@ export default function Home() {
     setSequenceIndex(nextIndex);
     setStep(phase === "learning" ? "learn" : "review");
   };
+
+  const renderDone = () => (
+    <div className="flex min-h-screen w-full justify-center bg-zinc-50 text-zinc-900">
+      <div className="relative flex h-screen w-full max-w-md flex-col bg-white">
+        <header className="flex h-14 items-center justify-between border-b border-zinc-100 px-4">
+          <span />
+          <span className="text-[10px] font-bold uppercase tracking-[0.25em] text-zinc-400">
+            Done
+          </span>
+          <span />
+        </header>
+
+        <main className="no-scrollbar flex-1 overflow-y-auto pb-24">
+          <div className="px-6 pt-10">
+            <div className="rounded-xl border border-emerald-100 bg-emerald-50/40 p-5">
+              <h1 className="text-lg font-semibold text-zinc-900">
+                复习完成
+              </h1>
+              <p className="mt-1 text-sm text-zinc-600">
+                本轮复习已结束，你可以回到词池开始新一轮学习。
+              </p>
+            </div>
+          </div>
+        </main>
+
+        <div className="fixed bottom-0 left-1/2 z-10 w-full max-w-md -translate-x-1/2 border-t border-zinc-100 bg-white/95 px-4 py-3 backdrop-blur">
+          <button
+            onClick={() => setStep("preview")}
+            className="flex h-11 w-full items-center justify-center rounded-lg bg-zinc-900 text-sm font-semibold text-white active:scale-[0.98] transition"
+          >
+            返回词池
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 
   const cutCurrentInLearning = () => {
     if (phase !== "learning") return;
@@ -730,19 +766,7 @@ export default function Home() {
               }}
               className="flex h-11 flex-1 items-center justify-center gap-2 rounded-lg bg-zinc-900 text-sm font-semibold text-white active:scale-[0.98] transition"
             >
-              斩掉并确认词池
-            </button>
-            <button
-            onClick={() => {
-              if (skippedCore.length === 0 && skippedPair.length === 0) {
-                startLearning();
-              } else {
-                setShowTrimConfirm(true);
-              }
-            }}
-              className="hidden h-11 items-center justify-center rounded-lg border border-zinc-300 px-3 text-xs font-medium text-zinc-700 hover:bg-zinc-50 sm:flex"
-            >
-              直接开始学习
+              开始学习
             </button>
           </div>
         </div>
@@ -823,7 +847,28 @@ export default function Home() {
     // 复习阶段始终展示全部单词卡片（无论当前题型）
     const coreBankWords = coreWords.slice(0, CORE_COUNT);
     const pairBankWords = pairWords.slice(0, PAIR_COUNT);
-    const bankCount = Math.min(visibleCoreCount + visiblePairCount, 6);
+    // const bankCount = Math.min(visibleCoreCount + visiblePairCount, 6);
+
+    const isFirstCorePickOnlyOneCard =
+      phase === "learning" &&
+      sequenceIndex === 0 &&
+      phraseProgress === 0 &&
+      currentItem?.type === "corePick";
+
+    const displayedCoreBankWords = isFirstCorePickOnlyOneCard
+      ? [currentItem.targetCore]
+      : coreBankWords;
+
+    const displayedPairBankWords = isFirstCorePickOnlyOneCard ? [] : pairBankWords;
+
+    const activeCore =
+      !currentItem
+        ? null
+        : currentItem.type === "corePick"
+          ? currentItem.targetCore
+          : currentItem.type === "phrase"
+            ? (currentPhrase?.parts?.[1] ?? null)
+            : null;
 
     const cutDisabled =
       phase !== "learning" || !currentItem
@@ -862,6 +907,28 @@ export default function Home() {
               </div>
             ) : (
             <div className="flex flex-col items-center px-6 pt-6">
+              {phase === "learning" && (
+                <div className="mb-4 w-full">
+                  <div className="flex flex-wrap gap-2">
+                    {coreBankWords.map((w) => {
+                      const isActive = !!activeCore && w === activeCore;
+                      return (
+                        <div
+                          key={`core-progress-${w}`}
+                          className={`rounded-md px-2 py-1 text-[11px] font-semibold transition ${
+                            isActive
+                              ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200"
+                              : "bg-zinc-100 text-zinc-400"
+                          }`}
+                        >
+                          {w}
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
               <div className="mb-6 text-center">
                 <h1 className="mb-1 text-2xl font-semibold text-zinc-900">
                   {currentItem.type === "phrase"
@@ -969,15 +1036,15 @@ export default function Home() {
             </div>
 
             <section className="mt-4 px-6 pb-4">
-              <div className="mb-3 flex items-center justify-between">
-                <span className="text-[10px] font-medium text-zinc-400">
-                  {bankCount}/6
-                </span>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
+              <div
+                className={`grid gap-3 ${
+                  displayedPairBankWords.length === 0 ? "grid-cols-1" : "grid-cols-2"
+                }`}
+              >
                 <div className="space-y-3">
-                  {coreBankWords.map((w, idx) => {
-                    const unlocked = idx < visibleCoreCount;
+                  {displayedCoreBankWords.map((w, idx) => {
+                    const unlocked =
+                      isFirstCorePickOnlyOneCard ? true : idx < visibleCoreCount;
                     const used = usedIngredients.includes(w);
                     return (
                       <button
@@ -998,9 +1065,10 @@ export default function Home() {
                   })}
                 </div>
 
-                <div className="space-y-3">
-                  {pairBankWords.map((w, idx) => {
-                    const unlocked = idx < visiblePairCount;
+                {displayedPairBankWords.length > 0 && (
+                  <div className="space-y-3">
+                    {displayedPairBankWords.map((w, idx) => {
+                      const unlocked = idx < visiblePairCount;
                     const used = usedIngredients.includes(w);
                     return (
                       <button
@@ -1019,7 +1087,8 @@ export default function Home() {
                       </button>
                     );
                   })}
-                </div>
+                  </div>
+                )}
               </div>
             </section>
           </main>
@@ -1069,7 +1138,7 @@ export default function Home() {
                     }
                     const delayMs = isCorrect ? 650 : 420;
                     window.setTimeout(() => {
-                      if (phase === "review") {
+                      if (phase === "review" && isCorrect) {
                         goToNextDish();
                         return;
                       }
@@ -1099,7 +1168,7 @@ export default function Home() {
                   if (isCorrect) speakPhrase(expected);
                   const delayMs = isCorrect ? 650 : 420;
                   window.setTimeout(() => {
-                    if (phase === "review") {
+                    if (phase === "review" && isCorrect) {
                       goToNextDish();
                       return;
                     }
@@ -1523,6 +1592,7 @@ export default function Home() {
   if (step === "preview") return renderPreview();
   if (step === "learn" || step === "review") return renderLearn();
   if (step === "summary") return renderSummary();
+  if (step === "done") return renderDone();
   return renderFeedback();
 }
 
